@@ -66,21 +66,30 @@ called by `org-babel-execute-src-block'"
          (result-type (org-babel-get:sml processed-params :result-type))
          (full-body (org-babel-expand-body:sml
                      body params processed-params))
-         (results
-          (nth 1 (org-babel-comint-with-output (session org-babel-sml-eoe t body)
+         (lines
+          (org-babel-comint-with-output (session org-babel-sml-eoe t body)
                    (mapc
                     (lambda (line)
                       (insert (org-babel-chomp line))
                       (comint-send-input nil t))
-                    (list body "; \"stdIn\";")))))
-         (lines (split-string results "\n")))
+                    (list body "; \"stdIn\";"))))
+;         (lines (split-string results "\n")))
+	 )
     (mapconcat #'identity
-               (cons
+;               (cons
                 ;; remove leading = and - from SML/NJ multi-line input
-                (replace-regexp-in-string "^[ -]*[ =]+" "" (car lines))
+		(mapcar (lambda (x) 
+			  (replace-regexp-in-string "^[ -]*[ =]+" "" 
+			  (replace-regexp-in-string "^val it = \"stdIn\" : string$" "END" x))
+			  )
+			(butlast (cdr lines) 0))
+;		(mapcar #'identity lines)
+		"" 
                 ;; drop results of eoe-indicator
-                (butlast (cdr lines) 2))
-               "\n")))
+;                (butlast (cdr lines) 0)
+	)
+    )
+  )
 
 (defun org-babel-prep-session:sml (session params)
   "Prepare SESSION according to the header arguments specified in PARAMS."
