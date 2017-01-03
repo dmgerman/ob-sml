@@ -78,11 +78,15 @@ called by `org-babel-execute-src-block'"
     (mapconcat #'identity
 ;               (cons
                 ;; remove leading = and - from SML/NJ multi-line input
+
 		(mapcar (lambda (x) 
 			  (replace-regexp-in-string "^[ -]*[ =]+" "" 
 			  (replace-regexp-in-string "^val it = \"stdIn\" : string$" "END" x))
 			  )
-			(butlast (cdr lines) 0))
+;			(butlast (cdr lines) 0))
+                        (butlast lines 0))
+
+                
 ;		(mapcar #'identity lines)
 		"" 
                 ;; drop results of eoe-indicator
